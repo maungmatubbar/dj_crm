@@ -56,5 +56,14 @@
         Search
       </button>
     </form>
+    {% if user.is_authenticated %}
+    <div class="ml-3">
+      <a class="text-light" href="{% url 'logout' %}">Logout</a>
+    </div>
+    {% else %}
+    <div class="ml-3">
+      <a class="text-light" href="{% url 'home' %}">Login</a>
+    </div>
+    {% endif %}
   </div>
 </nav>
