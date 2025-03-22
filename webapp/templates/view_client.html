@@ -1,0 +1,73 @@
+{% extends 'base.html' %} 
+{% block title %}Clients{% endblock title %} 
+{% block content %}
+<div class="mx-auto">
+  <div>
+    {% if messages %}
+     {% for message in messages %}
+    <div
+      class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show"
+      role="alert"
+    >
+      <h4 class="alert-heading text-capitalize">{{ message.tags }}!</h4>
+      {{ message }}
+      <button
+        type="button"
+        class="close"
+        data-dismiss="alert"
+        aria-label="Close"
+      >
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    {% endfor %} {% endif %}
+  </div>
+  {% if user.is_authenticated %}
+  <div class="card">
+    <div class="card-body">
+    <div class="d-flex justify-content-between mb-2">
+      <h5 class="card-title">Details</h5>
+    </div>
+      <table class="table table-hover">
+        <tr>
+          <th scope="col">Full Name</th>
+          <td>{{client.full_name}}</td>
+        </tr>
+        <tr>
+          <th scope="col">Email</th>
+          <td>{{client.email}}</td>
+        </tr>
+        <tr>
+          <th scope="col">Phone</th>
+          <td>{{client.phone}}</td>
+        </tr>
+        <tr>
+          <th scope="col">Address</th>
+          <td>{{client.address}}</td>
+        </tr>
+        <tr>
+          <th scope="col">City</th>
+          <td>{{client.city}}</td>
+        </tr>
+        <tr>
+          <th scope="col">State</th>
+          <td>{{client.state}}</td>
+        </tr>
+        <tr>
+          <th scope="col">Zip Code</th>
+          <td>{{client.zip_code}}</td>
+        </tr>
+        <tr>
+          <th scope="col">Country</th>
+          <td>{{client.country}}</td>
+        </tr>
+        <tr>
+          <th scope="col">Created At</th>
+          <td>{{client.created_at}}</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endblock content %}

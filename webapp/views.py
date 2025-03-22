@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from .forms import RegisterForm
+from .models import Client
 # # Create your views here.
 def home(request):
     #check the logged in user
@@ -50,3 +51,16 @@ def register(request):
         form = RegisterForm()
 
     return render(request, "register.html", {"form": form})
+
+
+def get_clients(request):
+    clients = Client.objects.all()
+    return render(request, 'clients.html',{"clients":clients})
+
+def view_client(request, pk):
+    if request.user.is_authenticated:
+        client = Client.objects.get(id=pk)
+        return render(request, 'view_client.html',{"client":client})
+    else:
+        messages.error(request, 'You must be logged in to view this page')
+        return redirect('home')

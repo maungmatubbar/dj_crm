@@ -1,0 +1,66 @@
+{% extends 'base.html' %} 
+{% block title %}Clients{% endblock title %} 
+{% block content %}
+<div class="mx-auto">
+  <div>
+    {% if messages %}
+     {% for message in messages %}
+    <div
+      class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show"
+      role="alert"
+    >
+      <h4 class="alert-heading text-capitalize">{{ message.tags }}!</h4>
+      {{ message }}
+      <button
+        type="button"
+        class="close"
+        data-dismiss="alert"
+        aria-label="Close"
+      >
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    {% endfor %} {% endif %}
+  </div>
+  {% if user.is_authenticated %}
+  <div class="card">
+    <div class="card-body">
+    <div class="d-flex justify-content-between mb-2">
+      <h5 class="card-title">Client List</h5>
+      <a href="/create-client" class="btn btn-primary">Create Client</a>
+    </div>
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th scope="col">Full Name</th>
+            <th scope="col">Email</th>
+            <th scope="col">Phone</th>
+            <th scope="col">Address</th>
+            <th scope="col">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if clients %}
+            {% for client in clients %}
+            <tr>
+              <td>{{client.full_name}}</td>
+              <td>{{client.email}}</td>
+              <td>{{client.phone}}</td>
+              <td>{{client.address}}</td>
+              <td>
+              <div class="btn-group">
+                <a href="/update-client/{{client.id}}" class="btn btn-primary btn-sm">Update</a>
+                <a href="/delete-client/{{client.id}}" class="btn btn-danger btn-sm">Delete</a>
+                <a href="/view-client/{{client.id}}" class="btn btn-secondary btn-sm">View</a>
+              </div>
+              </td>
+            </tr>
+            {% endfor %}
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endblock content %}
