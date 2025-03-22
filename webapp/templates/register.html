@@ -1,0 +1,38 @@
+{% extends 'base.html' %} {% block title %}Register{% endblock title %} 
+{% block content %}
+<div class="col-md-6 mx-auto">
+  <div>
+    {% if messages %} {% for message in messages %}
+    <div
+      class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show"
+      role="alert"
+    >
+      <h4 class="alert-heading text-capitalize">{{ message.tags }}!</h4>
+      {{ message }}
+      <button
+        type="button"
+        class="close"
+        data-dismiss="alert"
+        aria-label="Close"
+      >
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    {% endfor %} {% endif %}
+  </div>
+  <div class="card my-5">
+    <div class="card-header">
+      <h2 class="card-title">Register</h2>
+    </div>
+    <div class="card-body">
+      <form method="post" action="{% url 'register' %}">
+        {% csrf_token %} {{ form.as_p }}
+
+        <div class="submit-row">
+          <button type="submit" class="btn btn-secondary">Register</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock content %}

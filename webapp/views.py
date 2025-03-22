@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
+from .forms import RegisterForm
 # # Create your views here.
 def home(request):
     #check the logged in user
@@ -22,12 +23,30 @@ def home(request):
     else:
         return render(request, 'home.html',{})
 
-# this function we will use for login
-# def login_view(request):
-#     # return render(request, 'login.html',{})
-#     pass
-
 def logout_view(request):
     logout(request)
     messages.success(request, 'Logout successful')
     return redirect('home')
+
+def register(request):
+    if request.method == "POST":
+        form = RegisterForm(request.POST)
+        if form.is_valid():
+            user = form.save() 
+            username = form.cleaned_data.get("username")
+            password = form.cleaned_data.get("password1")
+
+            # Authenticate the user
+            user = authenticate(username=username, password=password)
+            if user is not None:
+                login(request, user)
+                messages.success(request, "You have successfully registered and logged in!")
+                return redirect("home") 
+
+            messages.error(request, "Registration successful, but automatic login failed. Please log in manually.")
+            return redirect("login") 
+
+    else:
+        form = RegisterForm()
+
+    return render(request, "register.html", {"form": form})
