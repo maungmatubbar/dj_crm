@@ -64,3 +64,13 @@ def view_client(request, pk):
     else:
         messages.error(request, 'You must be logged in to view this page')
         return redirect('home')
+    
+def delete_client(request, pk):
+    if request.user.is_authenticated:
+        client = Client.objects.get(id=pk)
+        client.delete()
+        messages.success(request, 'Client deleted successfully')
+        return redirect('clients')
+    else:
+        messages.error(request, 'You must be logged in to view this page')
+        return redirect('home')
