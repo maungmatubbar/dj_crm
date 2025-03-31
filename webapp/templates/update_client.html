@@ -1,0 +1,175 @@
+
+{% extends 'base.html' %}  
+
+{% block title %} Edit Client {% endblock title %} 
+
+{% block content %}
+<div class="mx-auto">
+  <div>
+    {% if messages %} 
+      {% for message in messages %}
+      <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
+        <h4 class="alert-heading text-capitalize">{{ message.tags }}!</h4>
+        {{ message }}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      {% endfor %} 
+    {% endif %}
+  </div>
+  
+  {% if user.is_authenticated %}
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex justify-content-between mb-2">
+          <h5 class="card-title">Edit Client</h5>
+          <a href="{% url 'clients' %}" class="btn btn-primary">Go Back</a>
+        </div>
+        
+        <form method="post" action="{% url 'update_client' client.id %}" class="row">
+          {% csrf_token %}
+          
+          <div class="form-group col-md-6">
+            <label for="first_name">First Name</label>
+            <input
+              type="text"
+              class="form-control"
+              id="first_name"
+              name="first_name"
+              value="{{ form.first_name.value|default_if_none:'' }}"
+              placeholder="First Name"
+            />
+            {% if form.first_name.errors %}
+              <small class="text-danger">{{ form.first_name.errors.0 }}</small>
+            {% endif %}
+            <small class="form-text text-muted">{{ form.first_name.help_text }}</small>
+          </div>
+          
+          <div class="form-group col-md-6">
+            <label for="last_name">Last Name</label>
+            <input
+              type="text"
+              class="form-control"
+              id="last_name"
+              name="last_name"
+              value="{{ form.last_name.value|default_if_none:'' }}"
+              placeholder="Last Name"
+            />
+            {% if form.last_name.errors %}
+              <small class="text-danger">{{ form.last_name.errors.0 }}</small>
+            {% endif %}
+            <small class="form-text text-muted">{{ form.last_name.help_text }}</small>
+          </div>
+          
+          <div class="form-group col-md-6">
+            <label for="email">Email</label>
+            <input 
+              type="email" 
+              class="form-control" 
+              id="email" 
+              name="email"
+              value="{{ form.email.value|default_if_none:'' }}"
+              placeholder="Email Address"
+            />
+            {% if form.email.errors %}
+              <small class="text-danger">{{ form.email.errors.0 }}</small>
+            {% endif %}
+            <small class="form-text text-muted">{{ form.email.help_text }}</small>
+          </div>
+          
+          <div class="form-group col-md-6">
+            <label for="phone">Phone</label>
+            <input 
+              type="text" 
+              class="form-control" 
+              id="phone" 
+              name="phone"
+              value="{{ form.phone.value|default_if_none:'' }}"
+              placeholder="Phone Number"
+            />
+            {% if form.phone.errors %}
+              <small class="text-danger">{{ form.phone.errors.0 }}</small>
+            {% endif %}
+            <small class="form-text text-muted">{{ form.phone.help_text }}</small>
+          </div>
+          
+          <div class="form-group col-12">
+            <label for="address">Address</label>
+            <input 
+              type="text" 
+              class="form-control" 
+              id="address" 
+              name="address"
+              value="{{ form.address.value|default_if_none:'' }}"
+              placeholder="Street Address"
+            />
+            {% if form.address.errors %}
+              <small class="text-danger">{{ form.address.errors.0 }}</small>
+            {% endif %}
+            <small class="form-text text-muted">{{ form.address.help_text }}</small>
+          </div>
+          
+          <div class="form-group col-md-4">
+            <label for="city">City</label>
+            <input 
+              type="text" 
+              class="form-control" 
+              id="city" 
+              name="city"
+              value="{{ form.city.value|default_if_none:'' }}"
+              placeholder="City"
+            />
+            {% if form.city.errors %}
+              <small class="text-danger">{{ form.city.errors.0 }}</small>
+            {% endif %}
+            <small class="form-text text-muted">{{ form.city.help_text }}</small>
+          </div>
+          
+          <div class="form-group col-md-4">
+            <label for="state">State</label>
+            <input 
+              type="text" 
+              class="form-control" 
+              id="state" 
+              name="state"
+              value="{{ form.state.value|default_if_none:'' }}"
+              placeholder="State"
+              maxlength="2"
+            />
+            {% if form.state.errors %}
+              <small class="text-danger">{{ form.state.errors.0 }}</small>
+            {% endif %}
+            <small class="form-text text-muted">{{ form.state.help_text }}</small>
+          </div>
+          
+          <div class="form-group col-md-4">
+            <label for="zip_code">Zip Code</label>
+            <input
+              type="text"
+              class="form-control"
+              id="zip_code"
+              name="zip_code"
+              value="{{ form.zip_code.value|default_if_none:'' }}"
+              placeholder="Zip Code"
+            />
+            {% if form.zip_code.errors %}
+              <small class="text-danger">{{ form.zip_code.errors.0 }}</small>
+            {% endif %}
+            <small class="form-text text-muted">{{ form.zip_code.help_text }}</small>
+          </div>
+          
+          <div class="form-group col-12">
+            <button type="submit" class="btn btn-primary">Update Client</button>
+            <a href="{% url 'clients' %}" class="btn btn-secondary ml-2">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  {% else %}
+    <div class="alert alert-warning">
+      You must be logged in to edit clients. <a href="{% url 'login' %}">Login here</a>.
+    </div>
+  {% endif %}
+</div>
+{% endblock content %}
