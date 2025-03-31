@@ -1,8 +1,8 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
-from .forms import RegisterForm, ClientForm                 
-from .models import Client
+from .forms import RegisterForm, ClientForm, CreateProductForm, CreateServiceForm               
+from .models import Client, Product
 def home(request):
  
     if request.method == 'POST':    
@@ -154,3 +154,58 @@ def update_client(request, pk):
         'form': form,
         'client': client  
     })
+# For viewing products
+def client_products(request, client_pk):
+    if request.user.is_authenticated:
+        client = get_object_or_404(Client, id=client_pk)
+        products = client.product.all()
+        return render(request, 'products/products.html', {'client': client, 'products': products})
+    else:
+        messages.error(request, 'You must be logged in to view this page')
+        return redirect('home')
+# for creating product
+def client_create_product(request, client_pk):
+    if request.user.is_authenticated:
+        client = get_object_or_404(Client, id=client_pk)
+        if request.method == 'POST':
+            form = CreateProductForm(request.POST, client=client)
+            if form.is_valid():
+                product = form.save(commit=False)
+                product.client = client
+                product.save()
+                messages.success(request, 'Product created successfully')
+                return redirect('client_products', client_pk=client_pk)
+        else:
+            form = CreateProductForm()
+        return render(request, 'products/create.html', {'form': form, 'client': client})
+    else:
+        messages.error(request, 'You must be logged in to view this page')
+        return redirect('home')
+# For viewing services
+def client_services(request, client_pk):
+    if request.user.is_authenticated:
+        client = get_object_or_404(Client, id=client_pk)
+        services = client.service.all()
+        return render(request, 'services/services.html', {'client': client, 'services': services})
+    else:
+        messages.error(request, 'You must be logged in to view this page')
+        return redirect('home')
+# for creating service
+def client_create_service(request, client_pk):
+    if request.user.is_authenticated:
+        client = get_object_or_404(Client, id=client_pk)
+        if request.method == 'POST':
+            form = CreateServiceForm(request.POST, client=client)
+            if form.is_valid():
+                service = form.save(commit=False)
+                service.client = client
+                service.save()
+                messages.success(request, 'Service created successfully')
+                return redirect('client_services', client_pk=client_pk)
+        else:
+            form = CreateServiceForm()
+        return render(request, 'services/create.html', {'form': form, 'client': client})
+    else:
+        messages.error(request, 'You must be logged in to view this page')
+        return redirect('home')
+    

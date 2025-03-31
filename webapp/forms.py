@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django import forms
 from django.core.validators import RegexValidator
 from django.core.exceptions import ValidationError
-from .models import Client
+from .models import Client, Product, Service
 class RegisterForm(UserCreationForm):
     email = forms.EmailField(
         required=True,
@@ -88,3 +88,27 @@ class ClientForm(forms.ModelForm):
         if commit:
             instance.save()
         return instance
+# create new product form validation
+class CreateProductForm(forms.ModelForm):
+    product_name = forms.CharField(label='Product Name', max_length=100)
+    price = forms.DecimalField(label='Price', max_digits=10, decimal_places=2)
+
+    class Meta:
+        model = Product
+        fields = ['product_name', 'price']
+
+    def __init__(self, *args, **kwargs):
+        self.client = kwargs.pop('client', None)
+        super().__init__(*args, **kwargs)
+# create new service form
+class CreateServiceForm(forms.ModelForm):
+    service_name = forms.CharField(label='Product Name', max_length=100)
+    amount = forms.DecimalField(label='Price', max_digits=10, decimal_places=2)
+
+    class Meta:
+        model = Service
+        fields = ['service_name', 'amount']
+
+    def __init__(self, *args, **kwargs):
+        self.client = kwargs.pop('client', None)
+        super().__init__(*args, **kwargs)
