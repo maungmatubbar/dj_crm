@@ -3,19 +3,18 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from .forms import RegisterForm, ClientForm                 
 from .models import Client
-# # Create your views here.
 def home(request):
-    #check the logged in user
+ 
     if request.method == 'POST':    
         username = request.POST['username']
         password = request.POST['password']
         
-        # authenticate the user
+        
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
             messages.success(request, 'Login successful')
-            # Then we have to redirect to a page
+          
             return redirect('home')
         else:
             messages.error(request, 'Invalid username or password')
@@ -81,21 +80,25 @@ def create_client(request):
         return redirect('home')
 
     if request.method == 'POST':
-        form = ClientForm(request.POST)
+        form = ClientForm(request.POST)  
         if form.is_valid():
-            data = form.cleaned_data
-            client = Client(
-                full_name=f"{data['first_name']} {data['last_name']}",
-                address=data['address'],
-                email=data['email'],
-                phone=data['phone'],
-                city=data['city'],
-                state=data['state'],
-                zip_code=data['zip_code']
-            )
-            client.save()
-            messages.success(request, 'Client created successfully')
-            return redirect('clients')
+            try:
+                data = form.cleaned_data
+                client = Client(
+                    full_name=f"{data['first_name']} {data['last_name']}",
+                    address=data['address'],
+                    email=data['email'],
+                    phone=data['phone'],
+                    city=data['city'],
+                    state=data['state'],
+                    zip_code=data['zip_code']
+                )
+                client.save()
+                messages.success(request, 'Client created successfully')
+                return redirect('clients')
+            except Exception as e:
+                messages.error(request, f'Error creating client: {str(e)}')
+                return render(request, 'create_client.html', {'form': form})
     else:
         form = ClientForm()
 
@@ -117,15 +120,12 @@ def update_client(request, pk):
         if form.is_valid():
             try:
                 data = form.cleaned_data
-                phone_digits = ''.join(c for c in data['phone'] if c.isdigit())
-                formatted_phone = f"{phone_digits[:3]}-{phone_digits[3:6]}-{phone_digits[6:]}"
-                
                 client.full_name = f"{data['first_name']} {data['last_name']}"
                 client.address = data['address']
                 client.email = data['email']
-                client.phone = formatted_phone
+                client.phone = data['phone']
                 client.city = data['city']
-                client.state = data['state'].upper() 
+                client.state = data['state']
                 client.zip_code = data['zip_code']
                 client.save()
                 
@@ -133,23 +133,17 @@ def update_client(request, pk):
                 return redirect('clients')
             except Exception as e:
                 messages.error(request, f'Error updating client: {str(e)}')
-                return render(request, 'update_client.html', {'form': form})
+                return render(request, 'update_client.html', {'form': form, 'client': client})
     else:
-        # Split full name
         name_parts = client.full_name.split()
         first_name = name_parts[0] if name_parts else ''
         last_name = ' '.join(name_parts[1:]) if len(name_parts) > 1 else ''
-        
-        # Format phone for display
-        phone = client.phone
-        if len(phone) == 10 and phone.isdigit():
-            phone = f"{phone[:3]}-{phone[3:6]}-{phone[6:]}"
         
         form = ClientForm(initial={
             'first_name': first_name,
             'last_name': last_name,
             'email': client.email,
-            'phone': phone,
+            'phone': client.phone,
             'address': client.address,
             'city': client.city,
             'state': client.state,
@@ -159,4 +153,4 @@ def update_client(request, pk):
     return render(request, 'update_client.html', {
         'form': form,
         'client': client  
-    })       
+    })
