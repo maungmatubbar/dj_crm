@@ -3,6 +3,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from .forms import RegisterForm, ClientForm, CreateProductForm, CreateServiceForm               
 from .models import Client, Product
+from django.db.models import Q
 def home(request):
  
     if request.method == 'POST':    
@@ -53,8 +54,17 @@ def register(request):
 
 
 def get_clients(request):
-    clients = Client.objects.all()
-    return render(request, 'clients.html',{"clients":clients})
+    if not request.user.is_authenticated:
+        messages.error(request, 'You must be logged in to view this page')
+        return redirect('home')
+    search = ''
+    if request.method == 'GET':
+        if(request.GET.get('search')):
+            search = request.GET.get('search')
+            clients = Client.objects.filter(Q(full_name__icontains=search) | Q(email__icontains=search) | Q(phone__icontains=search) | Q(address__icontains=search) | Q(city__icontains=search) | Q(state__icontains=search) | Q(zip_code__icontains=search))
+        else:
+            clients = Client.objects.all()
+    return render(request, 'clients.html',{"clients":clients, "search":search})
 
 def view_client(request, pk):
     if request.user.is_authenticated:

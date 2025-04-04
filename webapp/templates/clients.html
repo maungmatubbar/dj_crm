@@ -29,6 +29,17 @@
       <h5 class="card-title">Client List</h5>
       <a href="/create-client" class="btn btn-primary">Create Client</a>
     </div>
+    <div>
+      <form action={% url 'clients' %} method="get">
+        <div class="input-group mb-3">
+          <input type="text" class="form-control" value="{{search}}" autocomplete="off" placeholder="Search" name="search">
+          <div class="input-group-append">
+            <button class="btn btn-outline-secondary" type="submit">Search</button>
+            <a href="{% url 'clients' %}" class="btn btn-outline-danger">Refresh</a>
+          </div>
+        </div>
+      </form>
+    </div>
       <table class="table table-hover">
         <thead>
           <tr>
