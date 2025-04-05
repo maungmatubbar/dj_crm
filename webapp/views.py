@@ -4,6 +4,10 @@ from django.contrib import messages
 from .forms import RegisterForm, ClientForm, CreateProductForm, CreateServiceForm               
 from .models import Client, Product
 from django.db.models import Q
+import csv
+from django.http import HttpResponse
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter
 def home(request):
  
     if request.method == 'POST':    
@@ -219,3 +223,54 @@ def client_create_service(request, client_pk):
         messages.error(request, 'You must be logged in to view this page')
         return redirect('home')
     
+def export_clients_csv(request):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment, filename=clients.csv'
+    # create a csv writer
+    writer = csv.writer(response)
+    # write the header row
+    writer.writerow(['Full Name', 'Email', 'Phone', 'Address', 'City', 'State', 'Zip Code'])
+    # write the data rows
+    for client in Client.objects.all():
+        writer.writerow([
+            client.full_name,
+            client.email,
+            client.phone,
+            client.address,
+            client.city,
+            client.state,
+            client.zip_code
+        ])
+    return response
+def export_clients_pdf(request):
+    try:
+        response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = 'attachment; filename="clients.pdf"'  # FIXED: semicolon, not comma
+
+        pdf = canvas.Canvas(response, pagesize=letter)
+        width, height = letter
+        pdf.setFont('Helvetica-Bold', 12)
+        pdf.drawString(50, height - 100, 'Full Name')
+        pdf.drawString(200, height - 100, 'Email')
+        pdf.drawString(400, height - 100, 'Phone')
+        pdf.setFont('Helvetica', 10)
+
+        y = height - 120  # moved down slightly so rows don't overlap with the header
+        for client in Client.objects.all():
+            pdf.drawString(50, y, str(client.full_name))
+            pdf.drawString(200, y, str(client.email))
+            pdf.drawString(400, y, str(client.phone))
+            y -= 20
+            if y < 50:
+                pdf.showPage()
+                pdf.setFont('Helvetica', 10)  # reset font on new page
+                y = height - 50
+
+        pdf.save()
+        return response
+
+    except BrokenPipeError:
+        # Client disconnected, ignore or log
+        print("Client disconnected during PDF generation.")
+        return HttpResponse(status=204)  # No Content
+
